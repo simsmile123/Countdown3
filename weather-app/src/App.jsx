@@ -1,30 +1,31 @@
-import { useState } from 'react'
-import './App.css'
-import LocationInput from './components/LocationInput'
+import React, { useEffect, useState } from 'react';
+import { fetchLocation } from './services/locationService';
 import GetWeather from './components/GetWeather';
 
 function App() {
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
-  return (
-    <>
-    <LocationInput 
-  
-    setLatitude={setLatitude}
-    setLongitude={setLongitude}
-    /> 
+    const [location, setLocation] = useState(null);
 
+    useEffect(() => {
+        async function getLocation() {
+            try {
+                const locationData = await fetchLocation();
+                setLocation(locationData);
+            } catch (error) {
+                console.error('Error fetching location:', error);
+            }
+        }
+        getLocation();
+    }, []);
 
-  {latitude && longitude && (
-    <div>
-          <p>Latitude: {latitude}</p>
-          <p>Longitude: {longitude}</p>
-          
-          <GetWeather latitude={latitude} longitude={longitude}/>
+    return (
+        <div>
+            {location ? (
+                <GetWeather latitude={location.latitude} longitude={location.longitude} />
+            ) : (
+                <p>Loading location...</p>
+            )}
         </div>
-      )}
-    </>
-  )
+    );
 }
 
-export default App
+export default App;
